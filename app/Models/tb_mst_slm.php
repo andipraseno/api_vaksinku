@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 // ************************************
-// unit
+// salesman
 // ************************************
-class tb_act_unt extends Model
+class tb_mst_slm extends Model
 {
     // variabel
     protected $connection = 'mysql';
 
-    protected $table = 'tb_act_unt';
+    protected $table = 'tb_mst_slm';
 
     // spesification
     protected $primaryKey = 'id';

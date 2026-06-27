@@ -6,40 +6,34 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\master\StatusPerkawinanRule_Nama;
+use App\Http\Controllers\master\GroupSalesmanRule_Nama;
 
-use App\Models\tb_mst_skw as tbStatusPerkawinan;
+use App\Models\tb_mst_slm_grp as tbGroupSalesman;
 
-class StatusPerkawinanController extends BaseController
+class GroupSalesmanController extends BaseController
 {
     public function index(Request $request)
     {
         $draw = $request->input('draw');
         $start = $request->input('start', 0);
         $length = $request->input('length', 25);
-        $searchValue = $request->input('search.value');
 
         // Filter dari modal
         $filterNama = $request->input('nama');
         $filterStatus = $request->input('status');
 
-        $query = tbStatusPerkawinan::query();
+        $query = tbGroupSalesman::query();
 
         // Hitung total semua data tanpa filter
         $recordsTotal = $query->count();
 
-        // Filter global pencarian (kolom "nama" saja)
-        if (!empty($searchValue)) {
-            $query->where('tb_mst_skw.nama', 'like', '%' . $searchValue . '%');
-        }
-
         // Filter khusus dari modal
         if (!empty($filterNama)) {
-            $query->where('tb_mst_skw.nama', 'like', '%' . $filterNama . '%');
+            $query->where('tb_mst_slm_grp.nama', 'like', '%' . $filterNama . '%');
         }
 
         if ($filterStatus !== null && $filterStatus !== '') {
-            $query->where('tb_mst_skw.status', $filterStatus);
+            $query->where('tb_mst_slm_grp.status', $filterStatus);
         }
 
         $recordsFiltered = $query->count();
@@ -52,18 +46,17 @@ class StatusPerkawinanController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'urutan', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'status'])) {
                 $field = match ($orderColumnName) {
-                    'nama' => 'tb_mst_skw.nama',
-                    'urutan' => 'tb_mst_skw.urutan',
-                    'status' => 'tb_mst_skw.status',
-                    default => 'tb_mst_skw.nama'
+                    'nama' => 'tb_mst_slm_grp.nama',
+                    'status' => 'tb_mst_slm_grp.status',
+                    default => 'tb_mst_slm_grp.nama'
                 };
 
                 $query->orderBy($field, $orderDir);
             }
         } else {
-            $query->orderBy('tb_mst_skw.nama');
+            $query->orderBy('tb_mst_slm_grp.nama');
         }
 
         $data = $query
@@ -84,9 +77,9 @@ class StatusPerkawinanController extends BaseController
     //********************
     public function show($id = "")
     {
-        $tbStatusPerkawinan = new tbStatusPerkawinan();
+        $tbGroupSalesman = new tbGroupSalesman();
 
-        $post = $tbStatusPerkawinan
+        $post = $tbGroupSalesman
             ->where('id', $id)
             ->first();
 
@@ -101,15 +94,15 @@ class StatusPerkawinanController extends BaseController
 
     public function combo()
     {
-        $tbStatusPerkawinan = new tbStatusPerkawinan();
+        $tbGroupSalesman = new tbGroupSalesman();
 
-        $data = $tbStatusPerkawinan
+        $data = $tbGroupSalesman
             ->select(
                 'id',
                 'nama'
             )
             ->where('status', 1)
-            ->orderBy('urutan')
+            ->orderBy('nama')
             ->get();
 
         return response()->json($data);
@@ -120,17 +113,16 @@ class StatusPerkawinanController extends BaseController
     //********************
     public function add(Request $request)
     {
-        $tbStatusPerkawinan = new tbStatusPerkawinan();
+        $tbGroupSalesman = new tbGroupSalesman();
 
         $id = $request->input('id');
-        $urutan = $request->input('urutan');
         $nama = $request->input('nama');
         $status = $request->input('status');
         $by = $request->input('by');
 
         // cek error
         $errList = array(
-            'nama' => ['required', new StatusPerkawinanRule_Nama($id, $nama)],
+            'nama' => ['required', new GroupSalesmanRule_Nama($id, $nama)],
         );
 
         $errMessage = array(
@@ -147,21 +139,19 @@ class StatusPerkawinanController extends BaseController
             return response()->json($errResult->errors(), 400);
         } else {
             if ($id == '') {
-                $post = $tbStatusPerkawinan
+                $post = $tbGroupSalesman
                     ->create([
                         'nama' => $nama,
-                        'urutan' => $urutan,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
 
                 $id = $post->id;
             } else {
-                $tbStatusPerkawinan
+                $tbGroupSalesman
                     ->where('id', $id)
                     ->update([
                         'nama' => $nama,
-                        'urutan' => $urutan,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

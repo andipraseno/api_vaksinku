@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 // ************************************
-// sub proses
+// kategori klinik
 // ************************************
-class tb_trs_prc_sub extends Model
+class tb_mst_klk_kat extends Model
 {
     // variabel
     protected $connection = 'mysql';
 
-    protected $table = 'tb_trs_prc_sub';
+    protected $table = 'tb_mst_klk_kat';
 
     // spesification
     protected $primaryKey = 'id';

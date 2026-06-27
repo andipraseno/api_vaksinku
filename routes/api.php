@@ -45,11 +45,6 @@ Route::middleware(['cek.token'])->prefix('system')->group(function () {
     Route::get('/branch_combo', 'system\BranchController@combo');
     Route::post('/branch_add', 'system\BranchController@add');
 
-    Route::get('/unit', 'system\UnitController@index');
-    Route::get('/unit_show/{id}', 'system\UnitController@show');
-    Route::get('/unit_combo/{branch_id}', 'system\UnitController@combo');
-    Route::post('/unit_add', 'system\UnitController@add');
-
     // access
     Route::get('/access', 'system\AccessController@index');
     Route::get('/access_show/{id}', 'system\AccessController@show');
@@ -100,15 +95,15 @@ Route::middleware(['cek.token'])->prefix('master')->group(function () {
     Route::get('/orientasi_customer_combo', 'master\OrientasiCustomerController@combo');
     Route::post('/orientasi_customer_add', 'master\OrientasiCustomerController@add');
 
-    Route::get('/kategori_mesin', 'master\KategoriMesinController@index');
-    Route::get('/kategori_mesin_show/{id}', 'master\KategoriMesinController@show');
-    Route::get('/kategori_mesin_combo', 'master\KategoriMesinController@combo');
-    Route::post('/kategori_mesin_add', 'master\KategoriMesinController@add');
+    Route::get('/kategori_klinik', 'master\KategoriKlinikController@index');
+    Route::get('/kategori_klinik_show/{id}', 'master\KategoriKlinikController@show');
+    Route::get('/kategori_klinik_combo', 'master\KategoriKlinikController@combo');
+    Route::post('/kategori_klinik_add', 'master\KategoriKlinikController@add');
 
-    Route::get('/group_gudang', 'master\GroupGudangController@index');
-    Route::get('/group_gudang_show/{id}', 'master\GroupGudangController@show');
-    Route::get('/group_gudang_combo', 'master\GroupGudangController@combo');
-    Route::post('/group_gudang_add', 'master\GroupGudangController@add');
+    Route::get('/group_salesman', 'master\GroupSalesmanController@index');
+    Route::get('/group_salesman_show/{id}', 'master\GroupSalesmanController@show');
+    Route::get('/group_salesman_combo', 'master\GroupSalesmanController@combo');
+    Route::post('/group_salesman_add', 'master\GroupSalesmanController@add');
 
     // customer
     Route::get('/customer', 'master\CustomerController@index');
@@ -122,39 +117,15 @@ Route::middleware(['cek.token'])->prefix('master')->group(function () {
     Route::get('/produk_combo', 'master\ProdukController@combo');
     Route::post('/produk_add', 'master\ProdukController@add');
 
-    // gudang
-    Route::get('/gudang', 'master\GudangController@index');
-    Route::get('/gudang_show/{id}', 'master\GudangController@show');
-    Route::get('/gudang_combo', 'master\GudangController@combo');
-    Route::post('/gudang_add', 'master\GudangController@add');
+    // salesman
+    Route::get('/salesman', 'master\SalesmanController@index');
+    Route::get('/salesman_show/{id}', 'master\SalesmanController@show');
+    Route::get('/salesman_combo', 'master\SalesmanController@combo');
+    Route::post('/salesman_add', 'master\SalesmanController@add');
 
-    // mesin
-    Route::get('/mesin', 'master\MesinController@index');
-    Route::get('/mesin_show/{id}', 'master\MesinController@show');
-    Route::get('/mesin_combo', 'master\MesinController@combo');
-    Route::post('/mesin_add', 'master\MesinController@add');
-
-    // kode defect
-    Route::get('/kode_defect', 'master\KodeDefectController@index');
-    Route::get('/kode_defect_show/{id}', 'master\KodeDefectController@show');
-    Route::get('/kode_defect_combo', 'master\KodeDefectController@combo');
-    Route::post('/kode_defect_add', 'master\KodeDefectController@add');
-});
-
-// produksi
-Route::middleware(['cek.token'])->prefix('produksi')->group(function () {
-    Route::get('/proses', 'produksi\ProsesController@index');
-    Route::get('/proses_show/{id}', 'produksi\ProsesController@show');
-    Route::get('/proses_combo', 'produksi\ProsesController@combo');
-    Route::post('/proses_add', 'produksi\ProsesController@add');
-
-    Route::get('/sub_proses', 'produksi\SubProsesController@index');
-    Route::get('/sub_proses_show/{id}', 'produksi\SubProsesController@show');
-    Route::get('/sub_proses_combo/{proses_id}', 'produksi\SubProsesController@combo');
-    Route::post('/sub_proses_add', 'produksi\SubProsesController@add');
-
-    Route::get('/step_proses', 'produksi\StepProsesController@index');
-    Route::get('/step_proses_show/{id}', 'produksi\StepProsesController@show');
-    Route::get('/step_proses_combo', 'produksi\StepProsesController@combo');
-    Route::post('/step_proses_add', 'produksi\StepProsesController@add');
+    // klinik
+    Route::get('/klinik', 'master\KlinikController@index');
+    Route::get('/klinik_show/{id}', 'master\KlinikController@show');
+    Route::get('/klinik_combo', 'master\KlinikController@combo');
+    Route::post('/klinik_add', 'master\KlinikController@add');
 });

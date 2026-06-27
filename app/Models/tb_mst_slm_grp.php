@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 // ************************************
-// mesin
+// group salesman
 // ************************************
-class tb_mst_msn extends Model
+class tb_mst_slm_grp extends Model
 {
     // variabel
     protected $connection = 'mysql';
 
-    protected $table = 'tb_mst_msn';
+    protected $table = 'tb_mst_slm_grp';
 
     // spesification
     protected $primaryKey = 'id';

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\master;
 
 use Illuminate\Contracts\Validation\Rule;
 
-use App\Models\tb_mst_sdr as tbGolonganDarah;
+use App\Models\tb_mst_slm_grp as tbGroupSalesman;
 
-class GolonganDarahRule_Nama implements Rule
+class GroupSalesmanRule_Nama implements Rule
 {
     protected $message;
     protected $id;
@@ -22,10 +22,10 @@ class GolonganDarahRule_Nama implements Rule
     {
         $hasil = true;
 
-        $tbGolonganDarah = new tbGolonganDarah();
+        $tbGroupSalesman = new tbGroupSalesman();
 
         // cek exist
-        $res_detail = $tbGolonganDarah
+        $res_detail = $tbGroupSalesman
             ->where('id', '<>', $this->id)
             ->where('nama', $this->nama)
             ->get();
