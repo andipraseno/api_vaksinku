@@ -1,0 +1,25 @@
+/_delete
+/node_modules
+/vendor
+
+# /.env
+# /.env.local
+# /.env.production
+# /.env.test
+
+# /public/storage/*
+
+# /storage/app/public/clients/*
+# !/storage/app/public/clients/
+
+/storage/framework/cache/*
+!/storage/framework/cache/
+/storage/framework/session/*
+!/storage/framework/session/
+/storage/framework/testing/*
+!/storage/framework/testing/
+/storage/framework/views/*
+!/storage/framework/views/
+
+/storage/logs/*
+!/storage/logs/
