@@ -6,54 +6,40 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\master\KodeDefectRule_Nama;
-use App\Http\Controllers\master\KodeDefectRule_Kode;
+use App\Http\Controllers\master\KategoriKlinikRule_Nama;
 
-use App\Models\tb_mst_kdf as tbKodeDefect;
+use App\Models\tb_mst_klk_kat as tbKategoriKlinik;
 
-class KodeDefectController extends BaseController
+class KategoriKlinikController extends BaseController
 {
     public function index(Request $request)
     {
         $draw = $request->input('draw');
         $start = $request->input('start', 0);
         $length = $request->input('length', 25);
+        $searchValue = $request->input('search.value');
 
         // Filter dari modal
         $filterNama = $request->input('nama');
-        $filterBranch = $request->input('branch_id');
-        $filterUnit = $request->input('unit_id');
         $filterStatus = $request->input('status');
 
-        $query = tbKodeDefect::query()
-            ->leftJoin('tb_act_unt as A', 'tb_mst_kdf.unit_id', '=', 'A.id')
-            ->leftJoin('tb_act_brc as B', 'A.branch_id', '=', 'B.id')
-            ->select(
-                'tb_mst_kdf.*',
-                'A.nama as unit_nama',
-                'B.nama as branch_nama',
-            );
-
+        $query = tbKategoriKlinik::query();
 
         // Hitung total semua data tanpa filter
         $recordsTotal = $query->count();
 
+        // Filter global pencarian (kolom "nama" saja)
+        if (!empty($searchValue)) {
+            $query->where('tb_mst_klk_kat.nama', 'like', '%' . $searchValue . '%');
+        }
+
         // Filter khusus dari modal
         if (!empty($filterNama)) {
-            $query->where('tb_mst_kdf.nama', 'like', '%' . $filterNama . '%');
-            $query->orWhere('tb_mst_kdf.kode', 'like', '%' . $filterNama . '%');
-        }
-
-        if (!empty($filterBranch)) {
-            $query->where('A.branch_id', $filterBranch);
-        }
-
-        if (!empty($filterUnit)) {
-            $query->where('tb_mst_kdf.unit_id', $filterUnit);
+            $query->where('tb_mst_klk_kat.nama', 'like', '%' . $filterNama . '%');
         }
 
         if ($filterStatus !== null && $filterStatus !== '') {
-            $query->where('tb_mst_kdf.status', $filterStatus);
+            $query->where('tb_mst_klk_kat.status', $filterStatus);
         }
 
         $recordsFiltered = $query->count();
@@ -66,20 +52,17 @@ class KodeDefectController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'branch_id', 'unit_id', 'kode', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'status'])) {
                 $field = match ($orderColumnName) {
-                    'nama' => 'tb_mst_kdf.nama',
-                    'branch_id' => 'A.branch_id',
-                    'unit_id' => 'tb_mst_kdf.unit_id',
-                    'kode' => 'tb_mst_kdf.kode',
-                    'status' => 'tb_mst_kdf.status',
-                    default => 'tb_mst_kdf.nama'
+                    'nama' => 'tb_mst_klk_kat.nama',
+                    'status' => 'tb_mst_klk_kat.status',
+                    default => 'tb_mst_klk_kat.nama'
                 };
 
                 $query->orderBy($field, $orderDir);
             }
         } else {
-            $query->orderBy('tb_mst_kdf.nama');
+            $query->orderBy('tb_mst_klk_kat.nama');
         }
 
         $data = $query
@@ -100,16 +83,10 @@ class KodeDefectController extends BaseController
     //********************
     public function show($id = "")
     {
-        $tbKodeDefect = new tbKodeDefect();
+        $tbKategoriKlinik = new tbKategoriKlinik();
 
-        $post = $tbKodeDefect
-            ->join('tb_act_unt as A', 'tb_mst_kdf.unit_id', '=', 'A.id')
-            ->select(
-                'tb_mst_kdf.*',
-                'A.branch_id',
-                'A.nama as unit_nama',
-            )
-            ->where('tb_mst_kdf.id', $id)
+        $post = $tbKategoriKlinik
+            ->where('id', $id)
             ->first();
 
         if (empty($post)) {
@@ -123,9 +100,9 @@ class KodeDefectController extends BaseController
 
     public function combo()
     {
-        $tbKodeDefect = new tbKodeDefect();
+        $tbKategoriKlinik = new tbKategoriKlinik();
 
-        $data = $tbKodeDefect
+        $data = $tbKategoriKlinik
             ->select(
                 'id',
                 'nama'
@@ -142,24 +119,20 @@ class KodeDefectController extends BaseController
     //********************
     public function add(Request $request)
     {
-        $tbKodeDefect = new tbKodeDefect();
+        $tbKategoriKlinik = new tbKategoriKlinik();
 
         $id = $request->input('id');
         $nama = $request->input('nama');
-        $kode = $request->input('kode');
-        $unit_id = $request->input('unit_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
         // cek error
         $errList = array(
-            'nama' => ['required', new KodeDefectRule_Nama($id, $unit_id, $nama)],
-            'kode' => ['required', new KodeDefectRule_Kode($id, $unit_id, $kode)],
+            'nama' => ['required', new KategoriKlinikRule_Nama($id, $nama)],
         );
 
         $errMessage = array(
             'nama.required' => 'Tidak boleh kosong!',
-            'kode.required' => 'Tidak boleh kosong!',
         );
 
         $errResult = Validator::make(
@@ -172,23 +145,19 @@ class KodeDefectController extends BaseController
             return response()->json($errResult->errors(), 400);
         } else {
             if ($id == '') {
-                $post = $tbKodeDefect
+                $post = $tbKategoriKlinik
                     ->create([
                         'nama' => $nama,
-                        'kode' => $kode,
-                        'unit_id' => $unit_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
 
                 $id = $post->id;
             } else {
-                $tbKodeDefect
+                $tbKategoriKlinik
                     ->where('id', $id)
                     ->update([
                         'nama' => $nama,
-                        'kode' => $kode,
-                        'unit_id' => $unit_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

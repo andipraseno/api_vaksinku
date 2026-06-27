@@ -6,11 +6,12 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\master\GudangRule_Nama;
+use App\Http\Controllers\master\KlinikRule_Nama;
+use App\Http\Controllers\master\KlinikRule_Kode;
 
-use App\Models\tb_mst_gdg as tbGudang;
+use App\Models\tb_mst_klk as tbKlinik;
 
-class GudangController extends BaseController
+class KlinikController extends BaseController
 {
     public function index(Request $request)
     {
@@ -20,18 +21,14 @@ class GudangController extends BaseController
 
         // Filter dari modal
         $filterNama = $request->input('nama');
-        $filterBranchId = $request->input('branch_id');
-        $filterUnitId = $request->input('unit_id');
-        $filterGroupId = $request->input('group_id');
+        $filterKategoriId = $request->input('kategori_id');
         $filterStatus = $request->input('status');
 
-        $query = tbGudang::query()
-            ->leftJoin('tb_mst_gdg_grp as A', 'tb_mst_gdg.group_id', '=', 'A.id')
-            ->leftJoin('tb_act_unt as B', 'tb_mst_gdg.unit_id', '=', 'B.id')
+        $query = tbKlinik::query()
+            ->leftJoin('tb_mst_klk_kat as A', 'tb_mst_klk.kategori_id', '=', 'A.id')
             ->select(
-                'tb_mst_gdg.*',
-                'A.nama as group_nama',
-                'B.nama as unit_nama'
+                'tb_mst_klk.*',
+                'A.nama as kategori_nama',
             );
 
         // Hitung total semua data tanpa filter
@@ -39,7 +36,8 @@ class GudangController extends BaseController
 
         // Filter khusus dari modal
         if (!empty($filterNama)) {
-            $query->where('tb_mst_gdg.nama', 'like', '%' . $filterNama . '%');
+            $query->where('tb_mst_klk.nama', 'like', '%' . $filterNama . '%');
+            $query->orWhere('tb_mst_klk.kode', 'like', '%' . $filterNama . '%');
         }
 
         if (!empty($filterBranchId)) {
@@ -47,15 +45,15 @@ class GudangController extends BaseController
         }
 
         if (!empty($filterUnitId)) {
-            $query->where('tb_mst_gdg.unit_id', $filterUnitId);
+            $query->where('tb_mst_klk.unit_id', $filterUnitId);
         }
 
-        if (!empty($filterGroupId)) {
-            $query->where('tb_mst_gdg.group_id', $filterGroupId);
+        if (!empty($filterKategoriId)) {
+            $query->where('tb_mst_klk.kategori_id', 'like', '%' . $filterKategoriId . '%');
         }
 
         if ($filterStatus !== null && $filterStatus !== '') {
-            $query->where('tb_mst_gdg.status', $filterStatus);
+            $query->where('tb_mst_klk.status', $filterStatus);
         }
 
         $recordsFiltered = $query->count();
@@ -68,19 +66,19 @@ class GudangController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'unit_nama', 'group_nama', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'kode', 'kategori_nama', 'status'])) {
                 $field = match ($orderColumnName) {
-                    'nama' => 'tb_mst_gdg.nama',
-                    'unit_nama' => 'B.nama',
-                    'group_nama' => 'A.nama',
-                    'status' => 'tb_mst_gdg.status',
-                    default => 'tb_mst_gdg.nama'
+                    'nama' => 'tb_mst_klk.nama',
+                    'kode' => 'tb_mst_klk.kode',
+                    'kategori_nama' => 'A.nama',
+                    'status' => 'tb_mst_klk.status',
+                    default => 'tb_mst_klk.nama'
                 };
 
                 $query->orderBy($field, $orderDir);
             }
         } else {
-            $query->orderBy('tb_mst_gdg.nama');
+            $query->orderBy('tb_mst_klk.nama');
         }
 
         $data = $query
@@ -101,16 +99,10 @@ class GudangController extends BaseController
     //********************
     public function show($id = "")
     {
-        $tbGudang = new tbGudang();
+        $tbKlinik = new tbKlinik();
 
-        $post = $tbGudang
-            ->join('tb_act_unt as A', 'tb_mst_gdg.unit_id', '=', 'A.id')
-            ->select(
-                'tb_mst_gdg.*',
-                'A.branch_id',
-                'A.nama as unit_nama'
-            )
-            ->where('tb_mst_gdg.id', $id)
+        $post = $tbKlinik
+            ->where('id', $id)
             ->first();
 
         if (empty($post)) {
@@ -124,9 +116,9 @@ class GudangController extends BaseController
 
     public function combo()
     {
-        $tbGudang = new tbGudang();
+        $tbKlinik = new tbKlinik();
 
-        $data = $tbGudang
+        $data = $tbKlinik
             ->select(
                 'id',
                 'nama'
@@ -143,25 +135,26 @@ class GudangController extends BaseController
     //********************
     public function add(Request $request)
     {
-        $tbGudang = new tbGudang();
+        $tbKlinik = new tbKlinik();
 
         $id = $request->input('id');
         $nama = $request->input('nama');
-        $urutan = $request->input('urutan');
-        $unit_id = $request->input('unit_id');
-        $group_id = $request->input('group_id');
+        $kode = $request->input('kode');
+        $kategori_id = $request->input('kategori_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
         // cek error
         $errList = array(
-            'nama' => ['required', new GudangRule_Nama($id, $unit_id, $nama)],
-            'group_id' => 'required',
+            'nama' => ['required', new KlinikRule_Nama($id, $nama)],
+            'kode' => ['required', new KlinikRule_Kode($id, $kode)],
+            'kategori_id' => 'required',
         );
 
         $errMessage = array(
             'nama.required' => 'Tidak boleh kosong!',
-            'group_id.required' => 'Belum dipilih!',
+            'kode.required' => 'Tidak boleh kosong!',
+            'kategori_id.required' => 'Belum dipilih!',
         );
 
         $errResult = Validator::make(
@@ -174,25 +167,23 @@ class GudangController extends BaseController
             return response()->json($errResult->errors(), 400);
         } else {
             if ($id == '') {
-                $post = $tbGudang
+                $post = $tbKlinik
                     ->create([
                         'nama' => $nama,
-                        'urutan' => $urutan,
-                        'unit_id' => $unit_id,
-                        'group_id' => $group_id,
+                        'kode' => $kode,
+                        'kategori_id' => $kategori_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
 
                 $id = $post->id;
             } else {
-                $tbGudang
+                $tbKlinik
                     ->where('id', $id)
                     ->update([
                         'nama' => $nama,
-                        'urutan' => $urutan,
-                        'unit_id' => $unit_id,
-                        'group_id' => $group_id,
+                        'kode' => $kode,
+                        'kategori_id' => $kategori_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

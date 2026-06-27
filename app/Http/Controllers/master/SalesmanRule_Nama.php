@@ -4,19 +4,17 @@ namespace App\Http\Controllers\master;
 
 use Illuminate\Contracts\Validation\Rule;
 
-use App\Models\tb_mst_kdf as tbKodeDefect;
+use App\Models\tb_mst_slm as tbSalesman;
 
-class KodeDefectRule_Nama implements Rule
+class SalesmanRule_Nama implements Rule
 {
     protected $message;
     protected $id;
-    protected $unit_id;
     protected $nama;
 
-    public function __construct($id, $unit_id, $nama)
+    public function __construct($id, $nama)
     {
         $this->id = $id;
-        $this->unit_id = $unit_id;
         $this->nama = $nama;
     }
 
@@ -24,12 +22,11 @@ class KodeDefectRule_Nama implements Rule
     {
         $hasil = true;
 
-        $tbKodeDefect = new tbKodeDefect();
+        $tbSalesman = new tbSalesman();
 
         // cek exist
-        $res_detail = $tbKodeDefect
+        $res_detail = $tbSalesman
             ->where('id', '<>', $this->id)
-            ->where('unit_id', $this->unit_id)
             ->where('nama', $this->nama)
             ->get();
 

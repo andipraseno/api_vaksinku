@@ -6,40 +6,44 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\master\KategoriMesinRule_Nama;
+use App\Http\Controllers\master\SalesmanRule_Nama;
 
-use App\Models\tb_mst_msn_kat as tbKategoriMesin;
+use App\Models\tb_mst_slm as tbSalesman;
 
-class KategoriMesinController extends BaseController
+class SalesmanController extends BaseController
 {
     public function index(Request $request)
     {
         $draw = $request->input('draw');
         $start = $request->input('start', 0);
         $length = $request->input('length', 25);
-        $searchValue = $request->input('search.value');
 
         // Filter dari modal
         $filterNama = $request->input('nama');
+        $filterGroupId = $request->input('group_id');
         $filterStatus = $request->input('status');
 
-        $query = tbKategoriMesin::query();
+        $query = tbSalesman::query()
+            ->leftJoin('tb_mst_slm_grp as A', 'tb_mst_slm.group_id', '=', 'A.id')
+            ->select(
+                'tb_mst_slm.*',
+                'A.nama as group_nama',
+            );
 
         // Hitung total semua data tanpa filter
         $recordsTotal = $query->count();
 
-        // Filter global pencarian (kolom "nama" saja)
-        if (!empty($searchValue)) {
-            $query->where('tb_mst_msn_kat.nama', 'like', '%' . $searchValue . '%');
-        }
-
         // Filter khusus dari modal
         if (!empty($filterNama)) {
-            $query->where('tb_mst_msn_kat.nama', 'like', '%' . $filterNama . '%');
+            $query->where('tb_mst_slm.nama', 'like', '%' . $filterNama . '%');
+        }
+
+        if (!empty($filterGroupId)) {
+            $query->where('tb_mst_slm.group_id', $filterGroupId);
         }
 
         if ($filterStatus !== null && $filterStatus !== '') {
-            $query->where('tb_mst_msn_kat.status', $filterStatus);
+            $query->where('tb_mst_slm.status', $filterStatus);
         }
 
         $recordsFiltered = $query->count();
@@ -52,17 +56,18 @@ class KategoriMesinController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'group_nama', 'status'])) {
                 $field = match ($orderColumnName) {
-                    'nama' => 'tb_mst_msn_kat.nama',
-                    'status' => 'tb_mst_msn_kat.status',
-                    default => 'tb_mst_msn_kat.nama'
+                    'nama' => 'tb_mst_slm.nama',
+                    'group_nama' => 'A.nama',
+                    'status' => 'tb_mst_slm.status',
+                    default => 'tb_mst_slm.nama'
                 };
 
                 $query->orderBy($field, $orderDir);
             }
         } else {
-            $query->orderBy('tb_mst_msn_kat.nama');
+            $query->orderBy('tb_mst_slm.nama');
         }
 
         $data = $query
@@ -83,9 +88,9 @@ class KategoriMesinController extends BaseController
     //********************
     public function show($id = "")
     {
-        $tbKategoriMesin = new tbKategoriMesin();
+        $tbSalesman = new tbSalesman();
 
-        $post = $tbKategoriMesin
+        $post = $tbSalesman
             ->where('id', $id)
             ->first();
 
@@ -100,15 +105,15 @@ class KategoriMesinController extends BaseController
 
     public function combo()
     {
-        $tbKategoriMesin = new tbKategoriMesin();
+        $tbSalesman = new tbSalesman();
 
-        $data = $tbKategoriMesin
+        $data = $tbSalesman
             ->select(
                 'id',
                 'nama'
             )
             ->where('status', 1)
-            ->orderBy('nama')
+            ->orderBy('urutan')
             ->get();
 
         return response()->json($data);
@@ -119,20 +124,24 @@ class KategoriMesinController extends BaseController
     //********************
     public function add(Request $request)
     {
-        $tbKategoriMesin = new tbKategoriMesin();
+        $tbSalesman = new tbSalesman();
 
         $id = $request->input('id');
         $nama = $request->input('nama');
+        $urutan = $request->input('urutan');
+        $group_id = $request->input('group_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
         // cek error
         $errList = array(
-            'nama' => ['required', new KategoriMesinRule_Nama($id, $nama)],
+            'nama' => ['required', new SalesmanRule_Nama($id, $nama)],
+            'group_id' => 'required',
         );
 
         $errMessage = array(
             'nama.required' => 'Tidak boleh kosong!',
+            'group_id.required' => 'Belum dipilih!',
         );
 
         $errResult = Validator::make(
@@ -145,19 +154,23 @@ class KategoriMesinController extends BaseController
             return response()->json($errResult->errors(), 400);
         } else {
             if ($id == '') {
-                $post = $tbKategoriMesin
+                $post = $tbSalesman
                     ->create([
                         'nama' => $nama,
+                        'urutan' => $urutan,
+                        'group_id' => $group_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
 
                 $id = $post->id;
             } else {
-                $tbKategoriMesin
+                $tbSalesman
                     ->where('id', $id)
                     ->update([
                         'nama' => $nama,
+                        'urutan' => $urutan,
+                        'group_id' => $group_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
