@@ -29,11 +29,19 @@ class CustomerController extends BaseController
             ->leftJoin('tb_mst_cst_grp as A', 'tb_mst_cst.group_id', '=', 'A.id')
             ->leftJoin('tb_mst_cst_ort as B', 'tb_mst_cst.orientasi_id', '=', 'B.id')
             ->leftJoin('tb_mst_cst_jns as C', 'tb_mst_cst.jenis_id', '=', 'C.id')
+            ->leftJoin('tb_mst_pro_kot_kec as D1', 'tb_mst_cst.kecamatan_id', '=', 'D1.id')
+            ->leftJoin('tb_mst_pro_kot as D2', 'D1.kota_id', '=', 'D2.id')
+            ->leftJoin('tb_mst_pro as D3', 'D2.provinsi_id', '=', 'D3.id')
             ->select(
                 'tb_mst_cst.*',
                 'A.nama as group_nama',
                 'B.nama as orientasi_nama',
                 'C.nama as jenis_nama',
+                'D1.nama as kecamatan_nama',
+                'D1.kota_id',
+                'D2.nama AS kota_nama',
+                'D2.provinsi_id',
+                'D3.nama AS provinsi_nama',
             );
 
         // Hitung total semua data tanpa filter
@@ -110,7 +118,18 @@ class CustomerController extends BaseController
         $tbCustomer = new tbCustomer();
 
         $post = $tbCustomer
-            ->where('id', $id)
+            ->leftJoin('tb_mst_pro_kot_kec as D1', 'tb_mst_cst.kecamatan_id', '=', 'D1.id')
+            ->leftJoin('tb_mst_pro_kot as D2', 'D1.kota_id', '=', 'D2.id')
+            ->leftJoin('tb_mst_pro as D3', 'D2.provinsi_id', '=', 'D3.id')
+            ->select(
+                'tb_mst_cst.*',
+                'D1.nama as kecamatan_nama',
+                'D1.kota_id',
+                'D2.nama AS kota_nama',
+                'D2.provinsi_id',
+                'D3.nama AS provinsi_nama',
+            )
+            ->where("tb_mst_cst.id", $id)
             ->first();
 
         if (empty($post)) {
@@ -157,6 +176,7 @@ class CustomerController extends BaseController
         $orientasi_id = $request->input('orientasi_id');
         $npwp = $request->input('npwp');
         $nktp = $request->input('nktp');
+        $kecamatan_id = $request->input('kecamatan_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
@@ -206,6 +226,7 @@ class CustomerController extends BaseController
                         'otp' => $otp,
                         'npwp' => $npwp,
                         'nktp' => $nktp,
+                        'kecamatan_id' => $kecamatan_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -226,6 +247,7 @@ class CustomerController extends BaseController
                         'otp' => $otp,
                         'npwp' => $npwp,
                         'nktp' => $nktp,
+                        'kecamatan_id' => $kecamatan_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

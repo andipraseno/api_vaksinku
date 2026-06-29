@@ -102,7 +102,18 @@ class KlinikController extends BaseController
         $tbKlinik = new tbKlinik();
 
         $post = $tbKlinik
-            ->where('id', $id)
+            ->leftJoin('tb_mst_pro_kot_kec as D1', 'tb_mst_klk.kecamatan_id', '=', 'D1.id')
+            ->leftJoin('tb_mst_pro_kot as D2', 'D1.kota_id', '=', 'D2.id')
+            ->leftJoin('tb_mst_pro as D3', 'D2.provinsi_id', '=', 'D3.id')
+            ->select(
+                'tb_mst_klk.*',
+                'D1.nama as kecamatan_nama',
+                'D1.kota_id',
+                'D2.nama AS kota_nama',
+                'D2.provinsi_id',
+                'D3.nama AS provinsi_nama',
+            )
+            ->where("tb_mst_klk.id", $id)
             ->first();
 
         if (empty($post)) {
@@ -153,6 +164,7 @@ class KlinikController extends BaseController
         $npwp = $request->input('npwp');
         $otp = $request->input('otp');
         $kategori_id = $request->input('kategori_id');
+        $kecamatan_id = $request->input('kecamatan_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
@@ -202,6 +214,7 @@ class KlinikController extends BaseController
                         'pic_email' => $pic_email,
                         'otp' => $otp,
                         'kategori_id' => $kategori_id,
+                        'kecamatan_id' => $kecamatan_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -226,6 +239,7 @@ class KlinikController extends BaseController
                         'pic_email' => $pic_email,
                         'otp' => $otp,
                         'kategori_id' => $kategori_id,
+                        'kecamatan_id' => $kecamatan_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
