@@ -56,9 +56,10 @@ class SalesmanController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'group_nama', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'kode', 'group_nama', 'status'])) {
                 $field = match ($orderColumnName) {
                     'nama' => 'tb_mst_slm.nama',
+                    'kode' => 'tb_mst_slm.kode',
                     'group_nama' => 'A.nama',
                     'status' => 'tb_mst_slm.status',
                     default => 'tb_mst_slm.nama'
@@ -113,7 +114,7 @@ class SalesmanController extends BaseController
                 'nama'
             )
             ->where('status', 1)
-            ->orderBy('urutan')
+            ->orderBy('nama')
             ->get();
 
         return response()->json($data);
@@ -128,10 +129,21 @@ class SalesmanController extends BaseController
 
         $id = $request->input('id');
         $nama = $request->input('nama');
-        $urutan = $request->input('urutan');
+        $kode = $request->input('kode');
+        $handphone = $request->input('handphone');
+        $email = $request->input('email');
+        $otp = $request->input('otp');
         $group_id = $request->input('group_id');
         $status = $request->input('status');
         $by = $request->input('by');
+
+        if (empty($kode)) {
+            $kode = strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
+        }
+
+        if (empty($otp)) {
+            $otp = strtoupper(substr(md5(uniqid(rand(), true)), 0, 4));
+        }
 
         // cek error
         $errList = array(
@@ -157,7 +169,10 @@ class SalesmanController extends BaseController
                 $post = $tbSalesman
                     ->create([
                         'nama' => $nama,
-                        'urutan' => $urutan,
+                        'kode' => $kode,
+                        'handphone' => $handphone,
+                        'email' => $email,
+                        'otp' => $otp,
                         'group_id' => $group_id,
                         'status' => $status,
                         'created_by' => $by,
@@ -169,7 +184,10 @@ class SalesmanController extends BaseController
                     ->where('id', $id)
                     ->update([
                         'nama' => $nama,
-                        'urutan' => $urutan,
+                        'kode' => $kode,
+                        'handphone' => $handphone,
+                        'email' => $email,
+                        'otp' => $otp,
                         'group_id' => $group_id,
                         'status' => $status,
                         'updated_by' => $by,

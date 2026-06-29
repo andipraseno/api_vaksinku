@@ -35,9 +35,9 @@ Route::middleware(['cek.token'])->prefix('system')->group(function () {
     // profile
     Route::get('/company', 'system\CompanyController@index');
     Route::get('/company_show/{id}', 'system\CompanyController@show');
-    Route::get('/company_logo/{id}', 'system\CompanyController@logo_show');
     Route::get('/company_combo', 'system\CompanyController@combo');
     Route::post('/company_add', 'system\CompanyController@add');
+    Route::get('/company_logo/{id}', 'system\CompanyController@logo_show');
     Route::post('/company_logo', 'system\CompanyController@logo');
 
     Route::get('/branch', 'system\BranchController@index');
@@ -105,6 +105,11 @@ Route::middleware(['cek.token'])->prefix('master')->group(function () {
     Route::get('/group_salesman_combo', 'master\GroupSalesmanController@combo');
     Route::post('/group_salesman_add', 'master\GroupSalesmanController@add');
 
+    Route::get('/level_salesman', 'master\LevelSalesmanController@index');
+    Route::get('/level_salesman_show/{id}', 'master\LevelSalesmanController@show');
+    Route::get('/level_salesman_combo', 'master\LevelSalesmanController@combo');
+    Route::post('/level_salesman_add', 'master\LevelSalesmanController@add');
+
     // customer
     Route::get('/customer', 'master\CustomerController@index');
     Route::get('/customer_show/{id}', 'master\CustomerController@show');
@@ -116,6 +121,8 @@ Route::middleware(['cek.token'])->prefix('master')->group(function () {
     Route::get('/produk_show/{id}', 'master\ProdukController@show');
     Route::get('/produk_combo', 'master\ProdukController@combo');
     Route::post('/produk_add', 'master\ProdukController@add');
+    Route::get('/produk_gambar/{id}', 'system\ProdukController@gambar_show');
+    Route::post('/produk_gambar', 'system\ProdukController@gambar');
 
     // salesman
     Route::get('/salesman', 'master\SalesmanController@index');

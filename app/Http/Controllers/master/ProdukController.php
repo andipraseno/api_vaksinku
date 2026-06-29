@@ -151,8 +151,14 @@ class ProdukController extends BaseController
         $sku = $request->input('sku');
         $jenis_id = $request->input('jenis_id');
         $satuan_id = $request->input('satuan_id');
+        $harga = $request->input('harga');
         $status = $request->input('status');
         $by = $request->input('by');
+
+        // if sku = null, set rand
+        if (empty($sku)) {
+            $sku = strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
+        }
 
         // cek error
         $errList = array(
@@ -183,6 +189,7 @@ class ProdukController extends BaseController
                         'sku' => $sku,
                         'jenis_id' => $jenis_id,
                         'satuan_id' => $satuan_id,
+                        'harga' => $harga,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -196,6 +203,7 @@ class ProdukController extends BaseController
                         'sku' => $sku,
                         'jenis_id' => $jenis_id,
                         'satuan_id' => $satuan_id,
+                        'harga' => $harga,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
@@ -209,5 +217,59 @@ class ProdukController extends BaseController
                 ]
             ], 200);
         }
+    }
+
+
+    public function gambar(Request $request)
+    {
+        // 1. Validasi file
+        // $request->validate([
+        //     'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        // ]);
+
+        // 2. Cek apakah ada file yang diupload
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+
+            // 2. Custom Nama File
+            // Contoh: LOGO_NAMA-PERUSAHAAN_TIMESTAMP.png
+            $slugNama = str_replace(' ', '_', strtolower($request->id));
+            $extension = $file->getClientOriginalExtension(); // Ambil ekstensi asli (.jpg, .png, dll)
+            $namaFileBaru = $slugNama . "_" . time() . "." . $extension;
+
+            // 3. Simpan ke folder 'public/gambars' dengan nama baru
+            $path = $file->storeAs('company', $namaFileBaru, 'public');
+
+            // 4. Update Database (jika perlu)
+            $tbProduk = new tbProduk();
+
+            $tbProduk->where('id', $request->id)
+                ->update([
+                    'gambar' => $namaFileBaru
+                ]);
+
+            return response()->json([
+                'message' => 'Gambar berhasil diunggah!',
+                'file_name' => $namaFileBaru,
+                'path' => $path
+            ]);
+        }
+    }
+
+    public function gambar_show($id = null)
+    {
+        $tbProduk = new tbProduk();
+
+        $produk = $tbProduk
+            ->where('id', $id)
+            ->first();
+
+        if ($produk) {
+            $produk->gambar_url = $produk->gambar ? asset('storage/produk/' . $produk->gambar) : asset('storage/empty.png');
+
+            return response()->json($produk);
+        }
+
+        return response()->json(['message' => 'Not Found'], 404);
     }
 }

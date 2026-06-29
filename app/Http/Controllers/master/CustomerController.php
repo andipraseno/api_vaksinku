@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\master\CustomerRule_Nama;
-use App\Http\Controllers\master\CustomerRule_Kode;
 
 use App\Models\tb_mst_cst as tbCustomer;
 
@@ -21,7 +20,6 @@ class CustomerController extends BaseController
 
         // Filter dari modal
         $filterNama = $request->input('nama');
-        $filterBranchId = $request->input('branch_id');
         $filterGroupId = $request->input('group_id');
         $filterJenisId = $request->input('jenis_id');
         $filterOrientasiId = $request->input('orientasi_id');
@@ -31,13 +29,11 @@ class CustomerController extends BaseController
             ->leftJoin('tb_mst_cst_grp as A', 'tb_mst_cst.group_id', '=', 'A.id')
             ->leftJoin('tb_mst_cst_ort as B', 'tb_mst_cst.orientasi_id', '=', 'B.id')
             ->leftJoin('tb_mst_cst_jns as C', 'tb_mst_cst.jenis_id', '=', 'C.id')
-            ->leftJoin('tb_act_brc as D', 'tb_mst_cst.branch_id', '=', 'D.id')
             ->select(
                 'tb_mst_cst.*',
                 'A.nama as group_nama',
                 'B.nama as orientasi_nama',
                 'C.nama as jenis_nama',
-                'D.nama as branch_nama',
             );
 
         // Hitung total semua data tanpa filter
@@ -47,10 +43,6 @@ class CustomerController extends BaseController
         if (!empty($filterNama)) {
             $query->where('tb_mst_cst.nama', 'like', '%' . $filterNama . '%');
             $query->orWhere('tb_mst_cst.kode', 'like', '%' . $filterNama . '%');
-        }
-
-        if (!empty($filterBranchId)) {
-            $query->where('tb_mst_cst.branch_id', 'like', '%' . $filterBranchId . '%');
         }
 
         if (!empty($filterGroupId)) {
@@ -79,11 +71,11 @@ class CustomerController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'kode', 'branch_nama', 'group_nama', 'orientasi_nama', 'jenis_nama', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'kode', 'alamat', 'group_nama', 'orientasi_nama', 'jenis_nama', 'status'])) {
                 $field = match ($orderColumnName) {
                     'nama' => 'tb_mst_cst.nama',
                     'kode' => 'tb_mst_cst.kode',
-                    'branch_nama' => 'D.nama',
+                    'alamat' => 'tb_mst_cst.alamat',
                     'group_nama' => 'A.nama',
                     'orientasi_nama' => 'B.nama',
                     'jenis_nama' => 'C.nama',
@@ -156,18 +148,27 @@ class CustomerController extends BaseController
         $id = $request->input('id');
         $nama = $request->input('nama');
         $kode = $request->input('kode');
-        $branch_id = $request->input('branch_id');
+        $alamat = $request->input('alamat');
+        $handphone = $request->input('handphone');
+        $email = $request->input('email');
+        $otp = $request->input('otp');
         $group_id = $request->input('group_id');
         $jenis_id = $request->input('jenis_id');
         $orientasi_id = $request->input('orientasi_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
+        if (empty($kode)) {
+            $kode = strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
+        }
+
+        if (empty($otp)) {
+            $otp = strtoupper(substr(md5(uniqid(rand(), true)), 0, 4));
+        }
+
         // cek error
         $errList = array(
-            'nama' => ['required', new CustomerRule_Nama($id, $branch_id, $nama)],
-            'kode' => ['required', new CustomerRule_Kode($id, $branch_id, $kode)],
-            'branch_id' => 'required',
+            'nama' => ['required', new CustomerRule_Nama($id, $nama)],
             'group_id' => 'required',
             'jenis_id' => 'required',
             'orientasi_id' => 'required',
@@ -175,8 +176,6 @@ class CustomerController extends BaseController
 
         $errMessage = array(
             'nama.required' => 'Tidak boleh kosong!',
-            'kode.required' => 'Tidak boleh kosong!',
-            'branch_id.required' => 'Belum dipilih!',
             'group_id.required' => 'Belum dipilih!',
             'jenis_id.required' => 'Belum dipilih!',
             'orientasi_id.required' => 'Belum dipilih!',
@@ -199,7 +198,10 @@ class CustomerController extends BaseController
                         'group_id' => $group_id,
                         'jenis_id' => $jenis_id,
                         'orientasi_id' => $orientasi_id,
-                        'branch_id' => $branch_id,
+                        'alamat' => $alamat,
+                        'handphone' => $handphone,
+                        'email' => $email,
+                        'otp' => $otp,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -214,7 +216,10 @@ class CustomerController extends BaseController
                         'group_id' => $group_id,
                         'jenis_id' => $jenis_id,
                         'orientasi_id' => $orientasi_id,
-                        'branch_id' => $branch_id,
+                        'alamat' => $alamat,
+                        'handphone' => $handphone,
+                        'email' => $email,
+                        'otp' => $otp,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

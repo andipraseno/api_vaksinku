@@ -4,30 +4,30 @@ namespace App\Http\Controllers\master;
 
 use Illuminate\Contracts\Validation\Rule;
 
-use App\Models\tb_mst_klk as tbKlinik;
+use App\Models\tb_mst_slm_lev as tbLevelSalesman;
 
-class KlinikRule_Kode implements Rule
+class LevelSalesmanRule_Nama implements Rule
 {
     protected $message;
     protected $id;
-    protected $kode;
+    protected $nama;
 
-    public function __construct($id, $kode)
+    public function __construct($id, $nama)
     {
         $this->id = $id;
-        $this->kode = $kode;
+        $this->nama = $nama;
     }
 
     public function passes($attribute, $value)
     {
         $hasil = true;
 
-        $tbKlinik = new tbKlinik();
+        $tbLevelSalesman = new tbLevelSalesman();
 
         // cek exist
-        $res_detail = $tbKlinik
+        $res_detail = $tbLevelSalesman
             ->where('id', '<>', $this->id)
-            ->where('kode', $this->kode)
+            ->where('nama', $this->nama)
             ->get();
 
         if (count($res_detail) > 0) {

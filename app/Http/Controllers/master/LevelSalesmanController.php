@@ -6,11 +6,11 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\master\KlinikRule_Nama;
+use App\Http\Controllers\master\LevelSalesmanRule_Nama;
 
-use App\Models\tb_mst_klk as tbKlinik;
+use App\Models\tb_mst_slm_lev as tbLevelSalesman;
 
-class KlinikController extends BaseController
+class LevelSalesmanController extends BaseController
 {
     public function index(Request $request)
     {
@@ -20,39 +20,20 @@ class KlinikController extends BaseController
 
         // Filter dari modal
         $filterNama = $request->input('nama');
-        $filterKategoriId = $request->input('kategori_id');
         $filterStatus = $request->input('status');
 
-        $query = tbKlinik::query()
-            ->leftJoin('tb_mst_klk_kat as A', 'tb_mst_klk.kategori_id', '=', 'A.id')
-            ->select(
-                'tb_mst_klk.*',
-                'A.nama as kategori_nama',
-            );
+        $query = tbLevelSalesman::query();
 
         // Hitung total semua data tanpa filter
         $recordsTotal = $query->count();
 
         // Filter khusus dari modal
         if (!empty($filterNama)) {
-            $query->where('tb_mst_klk.nama', 'like', '%' . $filterNama . '%');
-            $query->orWhere('tb_mst_klk.kode', 'like', '%' . $filterNama . '%');
-        }
-
-        if (!empty($filterBranchId)) {
-            $query->where('B.branch_id', $filterBranchId);
-        }
-
-        if (!empty($filterUnitId)) {
-            $query->where('tb_mst_klk.unit_id', $filterUnitId);
-        }
-
-        if (!empty($filterKategoriId)) {
-            $query->where('tb_mst_klk.kategori_id', 'like', '%' . $filterKategoriId . '%');
+            $query->where('tb_mst_slm_lev.nama', 'like', '%' . $filterNama . '%');
         }
 
         if ($filterStatus !== null && $filterStatus !== '') {
-            $query->where('tb_mst_klk.status', $filterStatus);
+            $query->where('tb_mst_slm_lev.status', $filterStatus);
         }
 
         $recordsFiltered = $query->count();
@@ -65,20 +46,17 @@ class KlinikController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'kode', 'alamat', 'kategori_nama', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'status'])) {
                 $field = match ($orderColumnName) {
-                    'nama' => 'tb_mst_klk.nama',
-                    'kode' => 'tb_mst_klk.kode',
-                    'alamat' => 'tb_mst_klk.alamat',
-                    'kategori_nama' => 'A.nama',
-                    'status' => 'tb_mst_klk.status',
-                    default => 'tb_mst_klk.nama'
+                    'nama' => 'tb_mst_slm_lev.nama',
+                    'status' => 'tb_mst_slm_lev.status',
+                    default => 'tb_mst_slm_lev.nama'
                 };
 
                 $query->orderBy($field, $orderDir);
             }
         } else {
-            $query->orderBy('tb_mst_klk.nama');
+            $query->orderBy('tb_mst_slm_lev.nama');
         }
 
         $data = $query
@@ -99,9 +77,9 @@ class KlinikController extends BaseController
     //********************
     public function show($id = "")
     {
-        $tbKlinik = new tbKlinik();
+        $tbLevelSalesman = new tbLevelSalesman();
 
-        $post = $tbKlinik
+        $post = $tbLevelSalesman
             ->where('id', $id)
             ->first();
 
@@ -116,15 +94,15 @@ class KlinikController extends BaseController
 
     public function combo()
     {
-        $tbKlinik = new tbKlinik();
+        $tbLevelSalesman = new tbLevelSalesman();
 
-        $data = $tbKlinik
+        $data = $tbLevelSalesman
             ->select(
                 'id',
                 'nama'
             )
             ->where('status', 1)
-            ->orderBy('urutan')
+            ->orderBy('nama')
             ->get();
 
         return response()->json($data);
@@ -135,37 +113,20 @@ class KlinikController extends BaseController
     //********************
     public function add(Request $request)
     {
-        $tbKlinik = new tbKlinik();
+        $tbLevelSalesman = new tbLevelSalesman();
 
         $id = $request->input('id');
         $nama = $request->input('nama');
-        $kode = $request->input('kode');
-        $alamat = $request->input('alamat');
-        $handphone = $request->input('handphone');
-        $email = $request->input('email');
-        $pic = $request->input('pic');
-        $otp = $request->input('otp');
-        $kategori_id = $request->input('kategori_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
-        if (empty($kode)) {
-            $kode = strtoupper(substr(md5(uniqid(rand(), true)), 0, 8));
-        }
-
-        if (empty($otp)) {
-            $otp = strtoupper(substr(md5(uniqid(rand(), true)), 0, 4));
-        }
-
         // cek error
         $errList = array(
-            'nama' => ['required', new KlinikRule_Nama($id, $nama)],
-            'kategori_id' => 'required',
+            'nama' => ['required', new LevelSalesmanRule_Nama($id, $nama)],
         );
 
         $errMessage = array(
             'nama.required' => 'Tidak boleh kosong!',
-            'kategori_id.required' => 'Belum dipilih!',
         );
 
         $errResult = Validator::make(
@@ -178,33 +139,19 @@ class KlinikController extends BaseController
             return response()->json($errResult->errors(), 400);
         } else {
             if ($id == '') {
-                $post = $tbKlinik
+                $post = $tbLevelSalesman
                     ->create([
                         'nama' => $nama,
-                        'kode' => $kode,
-                        'alamat' => $alamat,
-                        'handphone' => $handphone,
-                        'email' => $email,
-                        'pic' => $pic,
-                        'otp' => $otp,
-                        'kategori_id' => $kategori_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
 
                 $id = $post->id;
             } else {
-                $tbKlinik
+                $tbLevelSalesman
                     ->where('id', $id)
                     ->update([
                         'nama' => $nama,
-                        'kode' => $kode,
-                        'alamat' => $alamat,
-                        'handphone' => $handphone,
-                        'email' => $email,
-                        'pic' => $pic,
-                        'otp' => $otp,
-                        'kategori_id' => $kategori_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
