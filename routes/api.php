@@ -65,6 +65,12 @@ Route::middleware(['cek.token'])->prefix('system')->group(function () {
 // master
 Route::middleware(['cek.token'])->prefix('master')->group(function () {
     // lampiran
+    Route::get('/provinsi_combo', 'master\ProvinsiController@provinsi');
+    Route::get('/kota_combo/{provinsi_id}', 'master\ProvinsiController@kota');
+    Route::get('/kecamatan_combo/{kota_id}', 'master\ProvinsiController@kecamatan');
+    Route::get('/kelurahan_combo/{kecamatan_id}', 'master\ProvinsiController@kelurahan');
+    Route::get('/kelurahan_selected/{id}', 'master\ProvinsiController@kelurahan_selected');
+
     Route::get('/satuan', 'master\SatuanController@index');
     Route::get('/satuan_show/{id}', 'master\SatuanController@show');
     Route::get('/satuan_combo', 'master\SatuanController@combo');
