@@ -21,13 +21,16 @@ class SalesmanController extends BaseController
         // Filter dari modal
         $filterNama = $request->input('nama');
         $filterGroupId = $request->input('group_id');
+        $filterLevelId = $request->input('level_id');
         $filterStatus = $request->input('status');
 
         $query = tbSalesman::query()
             ->leftJoin('tb_mst_slm_grp as A', 'tb_mst_slm.group_id', '=', 'A.id')
+            ->leftJoin('tb_mst_slm_lev as B', 'tb_mst_slm.level_id', '=', 'B.id')
             ->select(
                 'tb_mst_slm.*',
                 'A.nama as group_nama',
+                'B.nama as level_nama'
             );
 
         // Hitung total semua data tanpa filter
@@ -40,6 +43,10 @@ class SalesmanController extends BaseController
 
         if (!empty($filterGroupId)) {
             $query->where('tb_mst_slm.group_id', $filterGroupId);
+        }
+
+        if (!empty($filterLevelId)) {
+            $query->where('tb_mst_slm.level_id', $filterLevelId);
         }
 
         if ($filterStatus !== null && $filterStatus !== '') {
@@ -56,11 +63,12 @@ class SalesmanController extends BaseController
         if (isset($columns[$orderColumnIndex])) {
             $orderColumnName = $columns[$orderColumnIndex]['data'];
 
-            if (in_array($orderColumnName, ['nama', 'kode', 'group_nama', 'status'])) {
+            if (in_array($orderColumnName, ['nama', 'kode', 'group_nama', 'level_nama', 'status'])) {
                 $field = match ($orderColumnName) {
                     'nama' => 'tb_mst_slm.nama',
                     'kode' => 'tb_mst_slm.kode',
                     'group_nama' => 'A.nama',
+                    'level_nama' => 'B.nama',
                     'status' => 'tb_mst_slm.status',
                     default => 'tb_mst_slm.nama'
                 };
@@ -132,8 +140,12 @@ class SalesmanController extends BaseController
         $kode = $request->input('kode');
         $handphone = $request->input('handphone');
         $email = $request->input('email');
+        $nktp = $request->input('nktp');
+        $npwp = $request->input('npwp');
         $otp = $request->input('otp');
+        $alamat = $request->input('alamat');
         $group_id = $request->input('group_id');
+        $level_id = $request->input('level_id');
         $status = $request->input('status');
         $by = $request->input('by');
 
@@ -172,8 +184,12 @@ class SalesmanController extends BaseController
                         'kode' => $kode,
                         'handphone' => $handphone,
                         'email' => $email,
+                        'nktp' => $nktp,
+                        'npwp' => $npwp,
                         'otp' => $otp,
+                        'alamat' => $alamat,
                         'group_id' => $group_id,
+                        'level_id' => $level_id,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -187,8 +203,12 @@ class SalesmanController extends BaseController
                         'kode' => $kode,
                         'handphone' => $handphone,
                         'email' => $email,
+                        'nktp' => $nktp,
+                        'npwp' => $npwp,
                         'otp' => $otp,
+                        'alamat' => $alamat,
                         'group_id' => $group_id,
+                        'level_id' => $level_id,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

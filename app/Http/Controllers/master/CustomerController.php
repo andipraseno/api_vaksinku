@@ -155,6 +155,8 @@ class CustomerController extends BaseController
         $group_id = $request->input('group_id');
         $jenis_id = $request->input('jenis_id');
         $orientasi_id = $request->input('orientasi_id');
+        $npwp = $request->input('npwp');
+        $nktp = $request->input('nktp');
         $status = $request->input('status');
         $by = $request->input('by');
 
@@ -202,6 +204,8 @@ class CustomerController extends BaseController
                         'handphone' => $handphone,
                         'email' => $email,
                         'otp' => $otp,
+                        'npwp' => $npwp,
+                        'nktp' => $nktp,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -220,6 +224,8 @@ class CustomerController extends BaseController
                         'handphone' => $handphone,
                         'email' => $email,
                         'otp' => $otp,
+                        'npwp' => $npwp,
+                        'nktp' => $nktp,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
