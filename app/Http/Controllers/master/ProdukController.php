@@ -151,7 +151,10 @@ class ProdukController extends BaseController
         $sku = $request->input('sku');
         $jenis_id = $request->input('jenis_id');
         $satuan_id = $request->input('satuan_id');
-        $harga = $request->input('harga');
+        $base_price = $request->input('base_price');
+        $sale_price = $request->input('sale_price');
+        $margin = $request->input('margin');
+        $catatan = $request->input('catatan');
         $status = $request->input('status');
         $by = $request->input('by');
 
@@ -189,7 +192,10 @@ class ProdukController extends BaseController
                         'sku' => $sku,
                         'jenis_id' => $jenis_id,
                         'satuan_id' => $satuan_id,
-                        'harga' => $harga,
+                        'base_price' => $base_price,
+                        'sale_price' => $sale_price,
+                        'margin' => $margin,
+                        'catatan' => $catatan,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -203,7 +209,10 @@ class ProdukController extends BaseController
                         'sku' => $sku,
                         'jenis_id' => $jenis_id,
                         'satuan_id' => $satuan_id,
-                        'harga' => $harga,
+                        'base_price' => $base_price,
+                        'sale_price' => $sale_price,
+                        'margin' => $margin,
+                        'catatan' => $catatan,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
