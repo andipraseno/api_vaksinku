@@ -60,6 +60,9 @@ Route::middleware(['cek.token'])->prefix('system')->group(function () {
     Route::get('/user_combo', 'system\UserController@combo');
     Route::post('/user_add', 'system\UserController@add');
     Route::post('/user_password', 'system\UserController@password');
+
+    Route::get('/setting', 'system\SettingController@index');
+    Route::post('/setting_add', 'system\SettingController@add');
 });
 
 // master
