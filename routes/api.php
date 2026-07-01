@@ -145,3 +145,14 @@ Route::middleware(['cek.token'])->prefix('master')->group(function () {
     Route::get('/klinik_combo', 'master\KlinikController@combo');
     Route::post('/klinik_add', 'master\KlinikController@add');
 });
+
+// website
+Route::middleware(['cek.token'])->prefix('website')->group(function () {
+    Route::get('/language', 'website\LanguageController@index');
+    Route::get('/language_show/{id}', 'website\LanguageController@show');
+    Route::get('/language_combo', 'website\LanguageController@combo');
+    Route::post('/language_add', 'website\LanguageController@add');
+
+    Route::get('/agreement/{language_id}', 'website\AgreementController@index');
+    Route::post('/agreement_add', 'website\AgreementController@add');
+});

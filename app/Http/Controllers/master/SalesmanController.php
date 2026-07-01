@@ -146,6 +146,7 @@ class SalesmanController extends BaseController
         $alamat = $request->input('alamat');
         $group_id = $request->input('group_id');
         $level_id = $request->input('level_id');
+        $ref_kode = $request->input('ref_kode');
         $status = $request->input('status');
         $by = $request->input('by');
 
@@ -190,6 +191,7 @@ class SalesmanController extends BaseController
                         'alamat' => $alamat,
                         'group_id' => $group_id,
                         'level_id' => $level_id,
+                        'ref_kode' => $ref_kode,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -209,6 +211,7 @@ class SalesmanController extends BaseController
                         'alamat' => $alamat,
                         'group_id' => $group_id,
                         'level_id' => $level_id,
+                        'ref_kode' => $ref_kode,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);

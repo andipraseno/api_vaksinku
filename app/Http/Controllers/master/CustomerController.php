@@ -173,6 +173,8 @@ class CustomerController extends BaseController
         $otp = $request->input('otp');
         $group_id = $request->input('group_id');
         $jenis_id = $request->input('jenis_id');
+        $jenis_kelamin = $request->input('jenis_kelamin');
+        $tgl_lahir = $request->input('tgl_lahir');
         $orientasi_id = $request->input('orientasi_id');
         $npwp = $request->input('npwp');
         $nktp = $request->input('nktp');
@@ -227,6 +229,8 @@ class CustomerController extends BaseController
                         'npwp' => $npwp,
                         'nktp' => $nktp,
                         'kecamatan_id' => $kecamatan_id,
+                        'jenis_kelamin' => $jenis_kelamin,
+                        'tgl_lahir' => $tgl_lahir,
                         'status' => $status,
                         'created_by' => $by,
                     ]);
@@ -248,6 +252,8 @@ class CustomerController extends BaseController
                         'npwp' => $npwp,
                         'nktp' => $nktp,
                         'kecamatan_id' => $kecamatan_id,
+                        'jenis_kelamin' => $jenis_kelamin,
+                        'tgl_lahir' => $tgl_lahir,
                         'status' => $status,
                         'updated_by' => $by,
                     ]);
