@@ -229,7 +229,7 @@ class ProdukController extends BaseController
     }
 
 
-    public function gambar(Request $request)
+    public function gambar_add(Request $request)
     {
         // 1. Validasi file
         // $request->validate([
@@ -247,7 +247,7 @@ class ProdukController extends BaseController
             $namaFileBaru = $slugNama . "_" . time() . "." . $extension;
 
             // 3. Simpan ke folder 'public/gambars' dengan nama baru
-            $path = $file->storeAs('company', $namaFileBaru, 'public');
+            $path = $file->storeAs('produk', $namaFileBaru, 'public');
 
             // 4. Update Database (jika perlu)
             $tbProduk = new tbProduk();
@@ -274,7 +274,7 @@ class ProdukController extends BaseController
             ->first();
 
         if ($produk) {
-            $produk->gambar_url = $produk->gambar ? asset('storage/produk/' . $produk->gambar) : asset('storage/empty.png');
+            $produk->gambar = $produk->gambar ? asset('storage/produk/' . $produk->gambar) : asset('storage/empty.png');
 
             return response()->json($produk);
         }

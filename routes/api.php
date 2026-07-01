@@ -124,26 +124,42 @@ Route::middleware(['cek.token'])->prefix('master')->group(function () {
     Route::get('/customer_show/{id}', 'master\CustomerController@show');
     Route::get('/customer_combo', 'master\CustomerController@combo');
     Route::post('/customer_add', 'master\CustomerController@add');
+    Route::get('/customer_gambar_nktp_show/{id}', 'master\CustomerController@gambar_nktp_show');
+    Route::post('/customer_gambar_nktp_add', 'master\CustomerController@gambar_nktp_add');
+    Route::get('/customer_gambar_npwp_show/{id}', 'master\CustomerController@gambar_npwp_show');
+    Route::post('/customer_gambar_npwp_add', 'master\CustomerController@gambar_npwp_add');
 
     // produk
     Route::get('/produk', 'master\ProdukController@index');
     Route::get('/produk_show/{id}', 'master\ProdukController@show');
     Route::get('/produk_combo', 'master\ProdukController@combo');
     Route::post('/produk_add', 'master\ProdukController@add');
-    Route::get('/produk_gambar/{id}', 'system\ProdukController@gambar_show');
-    Route::post('/produk_gambar', 'system\ProdukController@gambar');
+    Route::get('/produk_gambar_show/{id}', 'master\ProdukController@gambar_show');
+    Route::post('/produk_gambar_add', 'master\ProdukController@gambar_add');
 
     // salesman
     Route::get('/salesman', 'master\SalesmanController@index');
     Route::get('/salesman_show/{id}', 'master\SalesmanController@show');
     Route::get('/salesman_combo', 'master\SalesmanController@combo');
     Route::post('/salesman_add', 'master\SalesmanController@add');
+    Route::get('/salesman_gambar_nktp_show/{id}', 'master\SalesmanController@gambar_nktp_show');
+    Route::post('/salesman_gambar_nktp_add', 'master\SalesmanController@gambar_nktp_add');
+    Route::get('/salesman_gambar_npwp_show/{id}', 'master\SalesmanController@gambar_npwp_show');
+    Route::post('/salesman_gambar_npwp_add', 'master\SalesmanController@gambar_npwp_add');
+    Route::get('/salesman_gambar_foto_show/{id}', 'master\SalesmanController@gambar_foto_show');
+    Route::post('/salesman_gambar_foto_add', 'master\SalesmanController@gambar_foto_add');
 
     // klinik
     Route::get('/klinik', 'master\KlinikController@index');
     Route::get('/klinik_show/{id}', 'master\KlinikController@show');
     Route::get('/klinik_combo', 'master\KlinikController@combo');
     Route::post('/klinik_add', 'master\KlinikController@add');
+    Route::get('/klinik_gambar_nktp_show/{id}', 'master\KlinikController@gambar_nktp_show');
+    Route::post('/klinik_gambar_nktp_add', 'master\KlinikController@gambar_nktp_add');
+    Route::get('/klinik_gambar_npwp_show/{id}', 'master\KlinikController@gambar_npwp_show');
+    Route::post('/klinik_gambar_npwp_add', 'master\KlinikController@gambar_npwp_add');
+    Route::get('/klinik_gambar_foto_show/{id}', 'master\KlinikController@gambar_foto_show');
+    Route::post('/klinik_gambar_foto_add', 'master\KlinikController@gambar_foto_add');
 });
 
 // website

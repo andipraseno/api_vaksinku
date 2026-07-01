@@ -268,4 +268,57 @@ class CustomerController extends BaseController
             ], 200);
         }
     }
+
+    public function gambar_npwp_add(Request $request)
+    {
+        // 1. Validasi file
+        // $request->validate([
+        //     'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        // ]);
+
+        // 2. Cek apakah ada file yang diupload
+        if ($request->hasFile('gambar_npwp')) {
+            $file = $request->file('gambar_npwp');
+
+            // 2. Custom Nama File
+            // Contoh: LOGO_NAMA-PERUSAHAAN_TIMESTAMP.png
+            $slugNama = str_replace(' ', '_', strtolower($request->id));
+            $extension = $file->getClientOriginalExtension(); // Ambil ekstensi asli (.jpg, .png, dll)
+            $namaFileBaru = $slugNama . "_" . time() . "." . $extension;
+
+            // 3. Simpan ke folder 'public/gambars' dengan nama baru
+            $path = $file->storeAs('produk', $namaFileBaru, 'public');
+
+            // 4. Update Database (jika perlu)
+            $tbProduk = new tbProduk();
+
+            $tbProduk->where('id', $request->id)
+                ->update([
+                    'gambar' => $namaFileBaru
+                ]);
+
+            return response()->json([
+                'message' => 'Gambar berhasil diunggah!',
+                'file_name' => $namaFileBaru,
+                'path' => $path
+            ]);
+        }
+    }
+
+    public function gambar_show($id = null)
+    {
+        $tbProduk = new tbProduk();
+
+        $produk = $tbProduk
+            ->where('id', $id)
+            ->first();
+
+        if ($produk) {
+            $produk->gambar = $produk->gambar ? asset('storage/produk/' . $produk->gambar) : asset('storage/empty.png');
+
+            return response()->json($produk);
+        }
+
+        return response()->json(['message' => 'Not Found'], 404);
+    }
 }
